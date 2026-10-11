@@ -93,7 +93,7 @@ Flashing this kernel will not void your warranty, but there is always a risk of 
 
 ### Root, hiding, and module capabilities
 
-- 🔐 **ReSukiSU**: Kernel-based Android root integration.
+- 🔐 **Selectable root implementations**: ReSukiSU, SukiSU Ultra, KernelSU Next, KernelSU, or BakaSU, chosen at build time.
 - 🥷 **SUSFS**: Root-hiding filesystem patches and userspace support.
 - 🚫 **NoMount**: MaxSteel NoMount kernel integration, paired with the matching flashable metamodule.
 - 🧩 **Module intercept and overlay mechanism**: Supports the supplied device-specific module overlay components.
@@ -130,6 +130,7 @@ Flashing this kernel will not void your warranty, but there is always a risk of 
 ## 📋 Installation Instructions
 
 - **KernelSU**: Developed by [tiann](https://github.com/tiann/KernelSU).
+- **SukiSU Ultra**: Developed by [SukiSU-Ultra](https://github.com/SukiSU-Ultra/SukiSU-Ultra).
 - **ReSukiSU**: Developed by [ReSukiSU Team](https://github.com/ReSukiSU/ReSukiSU)
 - **Magic-KSU**: Developed by [5ec1cff](https://github.com/5ec1cff/KernelSU).  
 - **SUSFS**: Developed by [simonpunk](https://gitlab.com/simonpunk/susfs4ksu.git).

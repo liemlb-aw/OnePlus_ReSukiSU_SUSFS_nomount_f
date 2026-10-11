@@ -61,6 +61,7 @@ jobs:
             exit 1
           fi
           case "$root_token" in
+            SUKISU) root_display="SukiSU" ;;
             KSUN) root_display="KernelSU Next" ;;
             ReSukiSU) root_display="ReSukiSU" ;;
             BakaSU) root_display="BakaSU" ;;
