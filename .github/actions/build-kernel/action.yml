@@ -3669,37 +3669,6 @@ runs:
         echo "✅ Dynamic USB DWC3 configs added"
         echo "::endgroup::"
 
-    - name: Add LXC / Droidspaces support
-      shell: bash
-      if: ${{ env.OP_LXC_DS == 'true' && env.OP_DS != 'true' }}
-      run: |
-        set -euo pipefail
-        echo "Add Droidspaces Support"
-        cd "$COMMON_KERNEL_FOLDER"
-        
-        echo "Applying patch to enable SYSVIPC without breaking ABI"
-        source "$GITHUB_WORKSPACE/patchgen/gen_patch.sh"
-        case "$OP_BRANCH" in
-          wild/sm8850|wild/sm8845)
-            DS_KABI="$KERNEL_PATCHES_FOLDER/common/droidspaces/fix_sysvipc_kabi_a16-6.12.patch" ;;
-          *)
-            DS_KABI="$KERNEL_PATCHES_FOLDER/common/droidspaces/fix_sysvipc_kabi_6_7_8.patch" ;;
-        esac
-        gen_patch ds-enable-sysvipc "$DS_KABI"
-        if ! grep -Eq '^ds-enable-sysvipc\|(applied|already)' "$PS_FILE" 2>/dev/null; then
-          echo "::error::SYSVIPC kABI patch failed to stage at fuzz=0 (see patch-faillogs)"
-          exit 1
-        fi
-        
-        cat >> "$COMMON_KERNEL_FOLDER/arch/arm64/configs/gki_defconfig" <<EOF
-        CONFIG_SYSVIPC = y
-        CONFIG_DEVTMPFS = y
-        CONFIG_PID_NS = y
-        CONFIG_POSIX_MQUEUE = y
-        EOF
-        echo "ds|applied" >> "$PS_FILE"
-        echo "✅ LXC / Droidspaces support added (SYSVIPC enabled, namespaces + POSIX mqueue configured)"
-
     - name: Add Droidspaces support
       shell: bash
       if: ${{ env.OP_DS == 'true' }}
@@ -3745,13 +3714,25 @@ runs:
         
         cat >> "$COMMON_KERNEL_FOLDER/arch/arm64/configs/gki_defconfig" <<EOF
         CONFIG_SYSVIPC=y
-        CONFIG_DEVTMPFS=y
         CONFIG_PID_NS=y
-        CONFIG_POSIX_MQUEUE=y
+        CONFIG_USER_NS=y
         CONFIG_NETFILTER_XT_TARGET_REJECT=y
         CONFIG_NETFILTER_XT_TARGET_LOG=y
         CONFIG_NETFILTER_XT_MATCH_RECENT=y
-        CONFIG_USER_NS=y
+        # Enable xattr, posix acl support on tmpfs
+        # For NixOS support
+        CONFIG_TMPFS_POSIX_ACL=y
+        CONFIG_TMPFS_XATTR=y
+
+        CONFIG_CGROUP_DEVICE=y
+        CONFIG_CGROUP_PIDS=y
+        CONFIG_FW_LOADER_COMPRESS=y
+        CONFIG_BRIDGE_NETFILTER=y
+        CONFIG_NF_TABLES=y
+        
+        # PI breaking
+        # CONFIG_POSIX_MQUEUE=y
+        # CONFIG_DEVTMPFS=y
         EOF
         
         gen_patch ds-guard-userns "$KERNEL_PATCHES_FOLDER/common/droidspaces/0001-Guard-USER_NS-for-non-root-users.patch"
